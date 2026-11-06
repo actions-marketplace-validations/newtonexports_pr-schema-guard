@@ -1,0 +1,31 @@
+name: 'PR Schema Guard'
+description: 'Validates JSON files in pull requests against a target JSON Schema'
+author: 'newtonexports'
+
+inputs:
+  schema-path:
+    description: 'Path to reference JSON Schema'
+    required: true
+  target-dir:
+    description: 'Directory containing JSON files to validate'
+    required: false
+    default: 'patterns/data'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      shell: bash
+      run: python -m pip install --upgrade jsonschema
+
+    - name: Run Schema Guard Check
+      shell: bash
+      run: |
+        python ${{ github.action_path }}/scripts/guard.py \
+          --schema "${{ inputs.schema-path }}" \
+          --target "${{ inputs.target-dir }}"
